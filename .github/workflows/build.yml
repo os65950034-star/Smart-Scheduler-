@@ -22,8 +22,16 @@ jobs:
         pip install -r requirements.txt
 
     - name: Build EXE with PyInstaller
+      shell: powershell
       run: |
-        pyinstaller --noconfirm --onedir --windowed --name "Smart-Scheduler" app.py
+        if (Test-Path "app.py") {
+            $target = "app.py"
+        } elseif (Test-Path "plainapp.py") {
+            $target = "plainapp.py"
+        } else {
+            $target = (Get-ChildItem -Filter *.py | Select-Object -First 1).Name
+        }
+        pyinstaller --noconfirm --onedir --windowed --name "Smart-Scheduler" $target
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
